@@ -42,7 +42,7 @@ public:
     }
 };
 
-int currentRecursionLevel = 5;
+int currentRecursionLevel = 7;
 int defaultW = 800, defaultH = 800;
 
 std::string generateLSystem(int level)
