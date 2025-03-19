@@ -8,7 +8,7 @@
 #include <iostream>
 #include <string>
 #include <complex>
-#include <GL/glut.h> //system-wide install (or compiler default path)
+#include "glut.h" //system-wide install (or compiler default path)
 
 // using namespace std::complex_literals;
 
@@ -28,18 +28,18 @@ double g_jfa = -0.82, g_jfb = -0.17; // Julia-Fatou a and b values.
 
 //----------------Utility functions----------------------
 
-void bitmapString(void *font, const char *str)
+void bitmapString(void* font, const char* str)
 {
     // Draw a string, character-by-character.
     char cp;
-    for (const char *c = str; *c != 0; ++c)
+    for (const char* c = str; *c != 0; ++c)
     {
         cp = *c; // to respect const
         glutBitmapCharacter(font, cp);
     }
 }
 
-void drawBitmapString(const char *str, float x = -2, float y = -2)
+void drawBitmapString(const char* str, float x = -2, float y = -2)
 {
     // Draw a string, optionally setting raster position.
     /*
@@ -98,8 +98,9 @@ protected:
 
 public:
     Turtle(double x = 0, double y = 0) : m_x(x),
-                                         m_y(y),
-                                         m_angle(0) {}
+        m_y(y),
+        m_angle(0) {
+    }
 
     void rotate(double angle)
     {
@@ -293,12 +294,45 @@ void Display2()
 }
 
 // TODO: 1.1) recursive-square fractal
+void drawSierpienski(double startX, double startY, int depth, double length = 0.66666) {
+    if (depth > 0)
+    {
+        Turtle turtle(startX, startY);
+        turtle.draw(length);
+        turtle.rotate(- pi / 2);
+        turtle.draw(length);
+        turtle.rotate(- pi / 2);
+        turtle.draw(length);
+        turtle.rotate(- pi / 2);
+        turtle.draw(length);
+
+        //sq1
+        drawSierpienski(startX - 2 / 3.f * length, startY + 2 / 3.f * length, depth - 1, length / 3);
+        //sq2
+        drawSierpienski(startX + 1 / 3.f * length, startY + 2 / 3.f * length, depth - 1, length / 3);
+        //sq3
+        drawSierpienski(startX + 4 / 3.f * length, startY + 2 / 3.f * length, depth - 1, length / 3);
+        //sq4
+        drawSierpienski(startX + 4 / 3.f * length, startY - 1 / 3.f * length, depth - 1, length / 3);
+        //sq5
+        drawSierpienski(startX + 4 / 3.f * length, startY - 4 / 3.f * length, depth - 1, length / 3);
+        //sq6
+        drawSierpienski(startX + 1 / 3.f * length, startY - 4 / 3.f * length, depth - 1, length / 3);
+        //sq7
+        drawSierpienski(startX - 2 / 3.f * length, startY - 4 / 3.f * length, depth - 1, length / 3);
+        //xq8
+        drawSierpienski(startX - 2 / 3.f * length, startY - 1 / 3.f * length, depth - 1, length / 3);
+    }
+}
+
 
 void Display3()
 {
     // Draw the recursive-square fractal here.
     glColor3f(1, 0, 0);
     drawRecursionLevel();
+    drawSierpienski(-0.33333f, 0.33333f, g_recursionCurrent);
+ 
 }
 
 // TODO: 1.2) hex-line fractal
@@ -329,7 +363,7 @@ std::string generateHexLineLSystem(int level)
     return axiom;
 }
 
-void drawHexLineFractal(Turtle &t, const std::string &instructions, double length)
+void drawHexLineFractal(Turtle& t, const std::string& instructions, double length)
 {
     for (char c : instructions)
     {
@@ -361,8 +395,6 @@ void Display4()
 
     // Recursion level = 4
     // TODO: fix drawRecursionLevel(), when pressing +, everything is gone
-
-    g_recursionCurrent = 4;
 
     if (g_recursionCurrent % 2 != 0)
     {
@@ -409,12 +441,12 @@ protected:
 
 public:
     JF(FloatType xmin, FloatType xmax, FloatType ymin, FloatType ymax, FloatType a = 0, FloatType b = 0, FloatType maxRadius = 20, int maxIteration = 150) : m_xmin(xmin),
-                                                                                                                                                             m_xmax(xmax),
-                                                                                                                                                             m_ymin(ymin),
-                                                                                                                                                             m_ymax(ymax),
-                                                                                                                                                             m_c(a, b),
-                                                                                                                                                             m_maxRadius(maxRadius),
-                                                                                                                                                             m_maxIteration(maxIteration)
+        m_xmax(xmax),
+        m_ymin(ymin),
+        m_ymax(ymax),
+        m_c(a, b),
+        m_maxRadius(maxRadius),
+        m_maxIteration(maxIteration)
     {
     }
 
@@ -467,9 +499,103 @@ void Display5()
 template <typename FloatType>
 class MB : public JF<FloatType>
 {
+protected:
+    // Override the Julia-Fatou test to make it Mandelbrot specific
+    inline int test(std::complex<FloatType> z, std::complex<FloatType> c, double maxRadius = 2, int maxIteration = 50) override
+    {
+        /*
+          In Mandelbrot, we always start with z = 0 and vary c.
+          This test estimates how quickly the sequence diverges.
+        */
+        z = 0;
+        for (int ii = maxIteration; ii > 0; --ii)
+        {
+            z = z * z + c;
+            if (abs(z) > maxRadius)
+                return ii;
+        }
+        return 0;
+    }
+
 public:
-    MB(FloatType xmin, FloatType xmax, FloatType ymin, FloatType ymax, FloatType a = 0, FloatType b = 0, FloatType maxRadius = 20, int maxIteration = 150) : JF<FloatType>(xmin, xmax, ymin, ymax, a, b, maxRadius, maxIteration) {}
+    MB(FloatType xmin, FloatType xmax, FloatType ymin, FloatType ymax, FloatType a = 0, FloatType b = 0, FloatType maxRadius = 20, int maxIteration = 150)
+        : JF<FloatType>(xmin, xmax, ymin, ymax, a, b, maxRadius, maxIteration) {}
+
+    // We vary c across the plane, not z
+    void draw(FloatType l, FloatType r, FloatType b, FloatType t, int samplePointsHorizontal, int samplePointsVertical)
+    {
+        glPointSize(1);
+        FloatType stepx = (this->m_xmax - this->m_xmin) / FloatType(samplePointsHorizontal);
+        FloatType stepy = (this->m_ymax - this->m_ymin) / FloatType(samplePointsVertical);
+        FloatType steph = (r - l) / FloatType(samplePointsHorizontal);
+        FloatType stepv = (t - b) / FloatType(samplePointsVertical);
+
+        int iterations;
+        std::complex<FloatType> c;
+
+        glBegin(GL_POINTS);
+        for (FloatType jj = 0, y = this->m_ymin, v = b; jj < samplePointsVertical; jj += 1, y += stepy, v += stepv)
+        {
+            c.imag(y);
+            for (FloatType ii = 0, x = this->m_xmin, h = l; ii < samplePointsHorizontal; ii += 1, x += stepx, h += steph)
+            {
+                c.real(x);
+                iterations = test(0, c, this->m_maxRadius, this->m_maxIteration);
+                if (!iterations)
+                {
+                    glColor3f(1, 0, 0);
+                    glVertex2d(h, v);
+                }
+            }
+        }
+        glEnd();
+    }
+
+    void drawWithColors(FloatType l, FloatType r, FloatType b, FloatType t, int samplePointsHorizontal, int samplePointsVertical)
+    {
+        glPointSize(1);
+        FloatType stepx = (this->m_xmax - this->m_xmin) / FloatType(samplePointsHorizontal);
+        FloatType stepy = (this->m_ymax - this->m_ymin) / FloatType(samplePointsVertical);
+        FloatType steph = (r - l) / FloatType(samplePointsHorizontal);
+        FloatType stepv = (t - b) / FloatType(samplePointsVertical);
+
+        int iterations;
+        std::complex<FloatType> c;
+
+        glBegin(GL_POINTS);
+        for (FloatType jj = 0, y = this->m_ymin, v = b; jj < samplePointsVertical; jj += 1, y += stepy, v += stepv)
+        {
+            c.imag(y);
+            for (FloatType ii = 0, x = this->m_xmin, h = l; ii < samplePointsHorizontal; ii += 1, x += stepx, h += steph)
+            {
+                c.real(x);
+                iterations = test(0, c, this->m_maxRadius, this->m_maxIteration);
+
+                if (!iterations)
+                {
+                    glColor3f(0, 0, 0);
+                }
+                else
+                {
+                    // Smooth coloring - map iterations to RGB
+                    float norm = float(iterations) / float(this->m_maxIteration);
+                    float r;
+                    float g;
+                    float b;
+                    r = sin(norm * 10);
+                    g = sin(norm * 15 + 1.0);
+                    b = sin(norm * 20 + 2.0);
+                    glColor3f(r, g, b);
+                }
+
+                glVertex2d(h, v);
+            }
+        }
+        glEnd();
+    }
+
 };
+
 
 void Display6()
 {
@@ -486,6 +612,15 @@ void Display6()
 
 void Display7()
 {
+    // Draw the Mandelbrot fractal here.
+    float drawSize = 1.0;
+    MB<double> mb(-2, 2, -2, 2);
+    /*
+      +1 because we're going full-window, and pixel-perfect drawing
+      is weird because pixels are actually placed at 0.5 coordinates.
+      More on this in the Shaders homework and lecture.
+    */
+    mb.drawWithColors(-drawSize, drawSize, -drawSize, drawSize, g_w + 1, g_h + 1);
 }
 
 void Display8()
@@ -634,7 +769,7 @@ void MouseFunc(int button, int state, int x, int y)
     std::cout << " at coordinates: " << x << " x " << y << std::endl;
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     glutInit(&argc, argv);
     glutInitWindowSize(g_w, g_h);
