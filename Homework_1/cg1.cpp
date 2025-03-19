@@ -292,6 +292,8 @@ void Display2()
     fractalBinaryTree(t, 0.95, g_recursionCurrent);
 }
 
+// TODO: 1.1) recursive-square fractal
+
 void Display3()
 {
     // Draw the recursive-square fractal here.
@@ -299,11 +301,79 @@ void Display3()
     drawRecursionLevel();
 }
 
+// TODO: 1.2) hex-line fractal
+
+std::string generateHexLineLSystem(int level)
+{
+    std::string axiom = "A";
+    for (int i = 0; i < level; ++i)
+    {
+        std::string next = "";
+        for (char c : axiom)
+        {
+            if (c == 'A')
+            {
+                next += "B-A-B";
+            }
+            else if (c == 'B')
+            {
+                next += "A+B+A";
+            }
+            else
+            {
+                next += c;
+            }
+        }
+        axiom = next;
+    }
+    return axiom;
+}
+
+void drawHexLineFractal(Turtle &t, const std::string &instructions, double length)
+{
+    for (char c : instructions)
+    {
+        if (c == 'A' || c == 'B')
+        {
+            t.draw(length);
+        }
+        else if (c == '+')
+        {
+            // 60 -> Left
+            t.rotate(pi / 3);
+        }
+        else if (c == '-')
+        {
+            // 60 -> Right
+            t.rotate(-pi / 3);
+        }
+    }
+}
+
 void Display4()
 {
-    // Draw the triangle-like hex line fractal here.
     glColor3f(1, 0, 0);
     drawRecursionLevel();
+
+    double startX = -0.5;
+    double startY = -0.5;
+    Turtle t(startX, startY);
+
+    // Recursion level = 4
+    // TODO: fix drawRecursionLevel(), when pressing +, everything is gone
+
+    g_recursionCurrent = 4;
+
+    if (g_recursionCurrent % 2 != 0)
+    {
+        t.rotate(pi / 3);
+    }
+
+    std::string instructions = generateHexLineLSystem(g_recursionCurrent);
+
+    double length = 1.0 / pow(2, g_recursionCurrent);
+
+    drawHexLineFractal(t, instructions, length);
 }
 
 template <typename FloatType>
