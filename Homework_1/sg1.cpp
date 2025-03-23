@@ -187,29 +187,25 @@ void plot(double (*x)(double, double, double), double (*y)(double, double, doubl
 
     double xmax = 0, ymax = 0;
 
-    // First, compute the maximum extent of the function to properly scale it
     for (double t = intervalStart; t <= intervalEnd; t += step)
     {
         double xVal = x(a, b, t);
         double yVal = y(a, b, t);
 
-        // Track maximum absolute values for scaling
         xmax = std::max(xmax, std::abs(xVal));
         ymax = std::max(ymax, std::abs(yVal));
     }
 
-    // Add a small margin to ensure the curve fits within the display area
+    // small margin
     xmax *= 1.1;
     ymax *= 1.1;
 
-    // Apply additional scaling if needed
+    // additional scaling (if needed)
     xmax /= scaleX;
     ymax /= scaleY;
 
-    // Plot the function with color gradient
     glBegin(primitive);
 
-    // Total number of points to draw
     int numPoints = (int)((intervalEnd - intervalStart) / step);
     int pointIndex = 0;
 
@@ -218,13 +214,14 @@ void plot(double (*x)(double, double, double), double (*y)(double, double, doubl
         double xVal = x(a, b, t);
         double yVal = y(a, b, t);
 
-        // Calculate gradient factor (0 to 1) based on current position
+        // gradient part
+        // 1 -> Red
+        // 0 -> Black
         double gradientFactor = (double)pointIndex / numPoints;
 
-        // Red component transitions based on gradient
-        glColor3f(1.0 - gradientFactor, 0.1, 0.1);
+        glColor3f(gradientFactor, 0.1, 0.1); // (1 - gradientFactor)7
 
-        // Scale to fit within the [-1, 1] OpenGL viewport
+        // scale to fit within the [-1, 1] OpenGL viewport
         glVertex2d(xVal / xmax, yVal / ymax);
 
         pointIndex++;
@@ -239,14 +236,12 @@ void plot(double (*x)(double, double, double), double (*y)(double, double, doubl
   For this plot, \(a = 0.3, \; b = 0.2\) .
 */
 
-// Limacon of Pascal x function
-double limaconX(double a, double b, double t)
+double circleconcoidX(double a, double b, double t)
 {
     return 2 * (a * cos(t) + b) * cos(t);
 }
 
-// Limacon of Pascal y function
-double limaconY(double a, double b, double t)
+double circleconcoidY(double a, double b, double t)
 {
     return 2 * (a * cos(t) + b) * sin(t);
 }
@@ -256,7 +251,7 @@ void Display4()
     double a = 0.3, b = 0.2;
     double tmin = -pi, tmax = pi;
 
-    plot(limaconX, limaconY, a, b, tmin, tmax);
+    plot(circleconcoidX, circleconcoidY, a, b, tmin, tmax);
 }
 
 /*
@@ -264,12 +259,12 @@ void Display4()
   \(x = a \cdot t - b \cdot sin(t), \; y = a - b \cdot cos(t), \; t \in \mathbb{R} \) .
   For this plot, \(a = 0.1, \; b = 0.2\) .
 */
+
 double cycloidX(double a, double b, double t)
 {
     return a * t - b * sin(t);
 }
 
-// Cycloid y function
 double cycloidY(double a, double b, double t)
 {
     return a - b * cos(t);
@@ -278,7 +273,7 @@ double cycloidY(double a, double b, double t)
 void Display5()
 {
     double a = 0.1, b = 0.2;
-    double tmin = 0, tmax = 6 * pi; // Using 6π to show 3 complete cycles
+    double tmin = 0, tmax = 6 * pi; // 6 pi for 3 complete cycles
 
     plot(cycloidX, cycloidY, a, b, tmin, tmax);
 }
@@ -290,15 +285,14 @@ void Display5()
   \( t \in \left[ 0, 2\pi \right] \) .
   For this plot, \(a = 0.1, \; b = 0.3\) .
 */
-// Epicycloid x function
-double epicycloidX(double a, double b, double t)
+
+double epicicloidX(double a, double b, double t)
 {
     double ratio = b / a;
     return (a + b) * cos(ratio * t) - b * cos(t + ratio * t);
 }
 
-// Epicycloid y function
-double epicycloidY(double a, double b, double t)
+double epicicloidY(double a, double b, double t)
 {
     double ratio = b / a;
     return (a + b) * sin(ratio * t) - b * sin(t + ratio * t);
@@ -309,7 +303,7 @@ void Display6()
     double a = 0.1, b = 0.3;
     double tmin = 0, tmax = 2 * pi;
 
-    plot(epicycloidX, epicycloidY, a, b, tmin, tmax);
+    plot(epicicloidX, epicicloidY, a, b, tmin, tmax);
 }
 
 /*
@@ -319,15 +313,14 @@ void Display6()
   \( t \in \left[ 0, 2\pi \right] \) .
   For this plot, \(a = 0.1, \; b = 0.3\) .
  */
-// Hypocycloid x function
-double hypocycloidX(double a, double b, double t)
+
+double hipocicloidX(double a, double b, double t)
 {
     double ratio = b / a;
     return (a - b) * cos(ratio * t) - b * cos(t - ratio * t);
 }
 
-// Hypocycloid y function
-double hypocycloidY(double a, double b, double t)
+double hipocicloidY(double a, double b, double t)
 {
     double ratio = b / a;
     return (a - b) * sin(ratio * t) - b * sin(t - ratio * t);
@@ -338,7 +331,7 @@ void Display7()
     double a = 0.1, b = 0.3;
     double tmin = 0, tmax = 2 * pi;
 
-    plot(hypocycloidX, hypocycloidY, a, b, tmin, tmax);
+    plot(hipocicloidX, hipocicloidY, a, b, tmin, tmax);
 }
 
 /*
@@ -351,6 +344,7 @@ void Display7()
  \( r = a \cdot e^{1+t}, \; t \in (0, \infty) \) .
  For this plot, \(a = 0.02\) .
 */
+
 void Display8()
 {
     double a = 0.02;
@@ -359,7 +353,6 @@ void Display8()
     double tmin = 0, tmax = 10;
     double step = 0.01;
 
-    // First, compute the maximum extent
     for (double t = tmin; t <= tmax; t += step)
     {
         double x = a * exp(1 + t) * cos(t);
@@ -369,11 +362,9 @@ void Display8()
         ymax = std::max(ymax, std::abs(y));
     }
 
-    // Add a small margin
     xmax *= 1.1;
     ymax *= 1.1;
 
-    // Plot the function with color gradient
     glBegin(GL_LINE_STRIP);
 
     int numPoints = (int)((tmax - tmin) / step);
@@ -384,10 +375,8 @@ void Display8()
         double x = a * exp(1 + t) * cos(t);
         double y = a * exp(1 + t) * sin(t);
 
-        // Calculate gradient factor
         double gradientFactor = (double)pointIndex / numPoints;
 
-        // Transition from red to black
         glColor3f(gradientFactor, 0.1, 0.1);
 
         glVertex2d(x / xmax, y / ymax);
@@ -413,7 +402,6 @@ void Display9()
     double tmax = 2 * pi;
     double step = 0.01;
 
-    // First, compute the maximum extent
     for (double t = tmin; t <= tmax; t += step)
     {
         double x = sin(a * t) * cos(t);
@@ -423,11 +411,9 @@ void Display9()
         ymax = std::max(ymax, std::abs(y));
     }
 
-    // Add a small margin
     xmax *= 1.1;
     ymax *= 1.1;
 
-    // Plot the function with color gradient
     glBegin(GL_LINE_STRIP);
 
     int numPoints = (int)((tmax - tmin) / step);
@@ -438,10 +424,8 @@ void Display9()
         double x = sin(a * t) * cos(t);
         double y = sin(a * t) * sin(t);
 
-        // Calculate gradient factor
         double gradientFactor = (double)pointIndex / numPoints;
 
-        // Transition from red to black
         glColor3f(gradientFactor, 0.1, 0.1);
 
         glVertex2d(x / xmax, y / ymax);

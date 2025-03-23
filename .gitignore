@@ -3,3 +3,6 @@ Homework_1/*.bin
 compile.txt
 Testing.cpp
 Testing.bin
+
+# Ignora fisierele de configurare ale sistemului
+.DS_Store
