@@ -144,19 +144,20 @@ void Display2()
    \)
  */
 
- // Function to calculate d(x) - distance to nearest integer
-double d(double x) {
+// Function to calculate d(x) - distance to nearest integer
+double d(double x)
+{
     int closest_int = round(x);
     return fabs(x - closest_int);
 }
 
 // Function to calculate f(x)
-double f(double x) {
+double f(double x)
+{
     if (!x)
         return 1.0;
     return d(x) / x;
 }
-
 
 void Display3()
 {
@@ -164,7 +165,7 @@ void Display3()
     double xmax = 20.0;
 
     double step = 0.05;
-    double ymax = 1.1; 
+    double ymax = 1.1;
 
     glColor3f(1, 0.1, 0.1);
     glBegin(GL_LINE_STRIP);
@@ -180,10 +181,60 @@ void Display3()
     glEnd();
 }
 
-
 // 3) function arguments e.g.: f(a, b, t), where a and b are function family parameters, and the is the driving variables.
-void plot(double (*x)(double, double, double), double (*y)(double, double, double), double a, double b, double intervalStart, double intervalEnd, double step = 0.01, double scaleX = 1, double scaleY = 1, GLint primitive = GL_LINE_STRIP);
+void plot(double (*x)(double, double, double), double (*y)(double, double, double),
+          double a, double b, double intervalStart, double intervalEnd,
+          double step = 0.01, double scaleX = 1, double scaleY = 1,
+          GLint primitive = GL_LINE_STRIP)
+{
 
+    double xmax = 0, ymax = 0;
+
+    // First, compute the maximum extent of the function to properly scale it
+    for (double t = intervalStart; t <= intervalEnd; t += step)
+    {
+        double xVal = x(a, b, t);
+        double yVal = y(a, b, t);
+
+        // Track maximum absolute values for scaling
+        xmax = std::max(xmax, std::abs(xVal));
+        ymax = std::max(ymax, std::abs(yVal));
+    }
+
+    // Add a small margin to ensure the curve fits within the display area
+    xmax *= 1.1;
+    ymax *= 1.1;
+
+    // Apply additional scaling if needed
+    xmax /= scaleX;
+    ymax /= scaleY;
+
+    // Plot the function with color gradient
+    glBegin(primitive);
+
+    // Total number of points to draw
+    int numPoints = (int)((intervalEnd - intervalStart) / step);
+    int pointIndex = 0;
+
+    for (double t = intervalStart; t <= intervalEnd; t += step)
+    {
+        double xVal = x(a, b, t);
+        double yVal = y(a, b, t);
+
+        // Calculate gradient factor (0 to 1) based on current position
+        double gradientFactor = (double)pointIndex / numPoints;
+
+        // Red component transitions based on gradient
+        glColor3f(1.0 - gradientFactor, 0.1, 0.1);
+
+        // Scale to fit within the [-1, 1] OpenGL viewport
+        glVertex2d(xVal / xmax, yVal / ymax);
+
+        pointIndex++;
+    }
+
+    glEnd();
+}
 /*
   2) Circle Concoid (Limaçon, Pascal's Snail):
   \(x = 2 \cdot (a \cdot cos(t) + b) \cdot cos(t), \; y = 2 \cdot (a \cdot cos(t) + b) \cdot sin(t), \; t \in (-\pi, \pi)\) .
@@ -240,6 +291,97 @@ void Display4()
 
     glEnd();
 }
+/////////
+// Limacon of Pascal x function
+double limaconX(double a, double b, double t)
+{
+    return 2 * (a * cos(t) + b) * cos(t);
+}
+
+// Limacon of Pascal y function
+double limaconY(double a, double b, double t)
+{
+    return 2 * (a * cos(t) + b) * sin(t);
+}
+
+void Display8()
+{
+    double a = 0.3, b = 0.2;
+    double tmin = -pi, tmax = pi;
+
+    plot(limaconX, limaconY, a, b, tmin, tmax);
+}
+/////////
+
+// Cycloid x function
+double cycloidX(double a, double b, double t)
+{
+    return a * t - b * sin(t);
+}
+
+// Cycloid y function
+double cycloidY(double a, double b, double t)
+{
+    return a - b * cos(t);
+}
+
+void Display9()
+{
+    double a = 0.1, b = 0.2;
+    double tmin = 0, tmax = 6 * pi; // Using 6π to show 3 complete cycles
+
+    plot(cycloidX, cycloidY, a, b, tmin, tmax);
+}
+
+///////////
+
+// Epicycloid x function
+double epicycloidX(double a, double b, double t)
+{
+    double ratio = b / a;
+    return (a + b) * cos(ratio * t) - b * cos(t + ratio * t);
+}
+
+// Epicycloid y function
+double epicycloidY(double a, double b, double t)
+{
+    double ratio = b / a;
+    return (a + b) * sin(ratio * t) - b * sin(t + ratio * t);
+}
+
+void Display10()
+{
+    double a = 0.1, b = 0.3;
+    double tmin = 0, tmax = 2 * pi;
+
+    plot(epicycloidX, epicycloidY, a, b, tmin, tmax);
+}
+
+///////////
+
+// Hypocycloid x function
+double hypocycloidX(double a, double b, double t)
+{
+    double ratio = b / a;
+    return (a - b) * cos(ratio * t) - b * cos(t - ratio * t);
+}
+
+// Hypocycloid y function
+double hypocycloidY(double a, double b, double t)
+{
+    double ratio = b / a;
+    return (a - b) * sin(ratio * t) - b * sin(t - ratio * t);
+}
+
+void Display11()
+{
+    double a = 0.1, b = 0.3;
+    double tmin = 0, tmax = 2 * pi;
+
+    plot(hypocycloidX, hypocycloidY, a, b, tmin, tmax);
+}
+
+////////
 
 /*
   2) Cicloid:
@@ -420,18 +562,12 @@ void Display7()
  \( r = a \cdot e^{1+t}, \; t \in (0, \infty) \) .
  For this plot, \(a = 0.02\) .
 */
-void Display8()
-{
-}
 
 /*
   4) Sine polar plot flower:
   \( r = sin(a \cdot t), \; t \in (0, \infty)  \) .
   For this plot, \(a = 10\), and the number 'petals' is \( 2 \cdot a \). Think about why.
 */
-void Display9()
-{
-}
 
 /*
 5) Longchamps' Trisectrix:
@@ -441,9 +577,6 @@ y = \frac{a \cdot tg(t)}{4 \cdot cos^2(t) - 3}, \;
 t \in (-\pi/2, \pi/2) \setminus \{ -\pi/6, \pi/6 \} \) .
 For this plot, \(a = 0.2\) .
  */
-void Display10()
-{
-}
 
 void init(void)
 {
