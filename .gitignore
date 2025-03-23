@@ -1,3 +1,5 @@
 # Ignora fisierele bin
 Homework_1/*.bin
 compile.txt
+Testing.cpp
+Testing.bin
