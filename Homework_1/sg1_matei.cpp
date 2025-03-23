@@ -144,54 +144,30 @@ void Display2()
    \)
  */
 
-// Tasks to Solve
+ // Function to calculate d(x) - distance to nearest integer
+double d(double x) {
+    int closest_int = round(x);
+    return fabs(x - closest_int);
+}
 
-// 1) First function to plot (zig-zag)
+// Function to calculate f(x)
+double f(double x) {
+    if (!x)
+        return 1.0;
+    return d(x) / x;
+}
+
 
 void Display3()
 {
-    // Define the range for x
     double xmin = 0.0;
-    double xmax = 100.0;
+    double xmax = 20.0;
 
-    // Calculate appropriate step size for good visual representation
     double step = 0.05;
+    double ymax = 1.1; 
 
-    // Find the maximum y value to scale the plot properly
-    double ymax = 2.0; // f(0) = 1 is our starting max
-
-    // Function to calculate d(x) - distance to nearest integer
-    auto d = [](double x) -> double
-    {
-        double closest_int = round(x);
-        return fabs(x - closest_int);
-    };
-
-    // Function to calculate f(x)
-    auto f = [&d](double x) -> double
-    {
-        if (!x)
-            return 1.0;
-        return d(x) / x;
-    };
-
-    // First pass to find ymax for proper scaling
-    for (double x = xmin + step; x <= xmax; x += step)
-    {
-        double y = f(x);
-        if (y > ymax)
-            ymax = y;
-    }
-
-    // Add a small margin to ymax
-    ymax *= 1.1;
-
-    // Plot the function
-    glColor3f(1, 0.1, 0.1); // Red color like in the example image
+    glColor3f(1, 0.1, 0.1);
     glBegin(GL_LINE_STRIP);
-
-    // Plot the point at x=0
-    glVertex2d(0, 1.0 / ymax);
 
     // Plot the rest of the function
     for (double x = xmin + step; x <= xmax; x += step)
@@ -203,6 +179,7 @@ void Display3()
 
     glEnd();
 }
+
 
 // 3) function arguments e.g.: f(a, b, t), where a and b are function family parameters, and the is the driving variables.
 void plot(double (*x)(double, double, double), double (*y)(double, double, double), double a, double b, double intervalStart, double intervalEnd, double step = 0.01, double scaleX = 1, double scaleY = 1, GLint primitive = GL_LINE_STRIP);
