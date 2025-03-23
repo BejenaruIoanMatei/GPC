@@ -143,18 +143,19 @@ void Display2()
      \right.
    \)
  */
-double d(double x) {
+double d(double x)
+{
     int closest_int = round(x);
     return fabs(x - closest_int);
 }
 
 // Function to calculate f(x)
-double f(double x) {
+double f(double x)
+{
     if (!x)
         return 1.0;
     return d(x) / x;
 }
-
 
 void Display3()
 {
@@ -167,7 +168,6 @@ void Display3()
     glColor3f(1, 0.1, 0.1);
     glBegin(GL_LINE_STRIP);
 
-    // Plot the rest of the function
     for (double x = xmin + step; x <= xmax; x += step)
     {
         double x_scaled = x / xmax;
@@ -177,6 +177,7 @@ void Display3()
 
     glEnd();
 }
+
 // 3) function arguments e.g.: f(a, b, t), where a and b are function family parameters, and the is the driving variables.
 void plot(double (*x)(double, double, double), double (*y)(double, double, double),
           double a, double b, double intervalStart, double intervalEnd,
@@ -231,13 +232,31 @@ void plot(double (*x)(double, double, double), double (*y)(double, double, doubl
 
     glEnd();
 }
+
 /*
   2) Circle Concoid (Limaçon, Pascal's Snail):
   \(x = 2 \cdot (a \cdot cos(t) + b) \cdot cos(t), \; y = 2 \cdot (a \cdot cos(t) + b) \cdot sin(t), \; t \in (-\pi, \pi)\) .
   For this plot, \(a = 0.3, \; b = 0.2\) .
 */
+
+// Limacon of Pascal x function
+double limaconX(double a, double b, double t)
+{
+    return 2 * (a * cos(t) + b) * cos(t);
+}
+
+// Limacon of Pascal y function
+double limaconY(double a, double b, double t)
+{
+    return 2 * (a * cos(t) + b) * sin(t);
+}
+
 void Display4()
 {
+    double a = 0.3, b = 0.2;
+    double tmin = -pi, tmax = pi;
+
+    plot(limaconX, limaconY, a, b, tmin, tmax);
 }
 
 /*
@@ -245,8 +264,23 @@ void Display4()
   \(x = a \cdot t - b \cdot sin(t), \; y = a - b \cdot cos(t), \; t \in \mathbb{R} \) .
   For this plot, \(a = 0.1, \; b = 0.2\) .
 */
+double cycloidX(double a, double b, double t)
+{
+    return a * t - b * sin(t);
+}
+
+// Cycloid y function
+double cycloidY(double a, double b, double t)
+{
+    return a - b * cos(t);
+}
+
 void Display5()
 {
+    double a = 0.1, b = 0.2;
+    double tmin = 0, tmax = 6 * pi; // Using 6π to show 3 complete cycles
+
+    plot(cycloidX, cycloidY, a, b, tmin, tmax);
 }
 
 /*
@@ -256,8 +290,26 @@ void Display5()
   \( t \in \left[ 0, 2\pi \right] \) .
   For this plot, \(a = 0.1, \; b = 0.3\) .
 */
+// Epicycloid x function
+double epicycloidX(double a, double b, double t)
+{
+    double ratio = b / a;
+    return (a + b) * cos(ratio * t) - b * cos(t + ratio * t);
+}
+
+// Epicycloid y function
+double epicycloidY(double a, double b, double t)
+{
+    double ratio = b / a;
+    return (a + b) * sin(ratio * t) - b * sin(t + ratio * t);
+}
+
 void Display6()
 {
+    double a = 0.1, b = 0.3;
+    double tmin = 0, tmax = 2 * pi;
+
+    plot(epicycloidX, epicycloidY, a, b, tmin, tmax);
 }
 
 /*
@@ -267,8 +319,26 @@ void Display6()
   \( t \in \left[ 0, 2\pi \right] \) .
   For this plot, \(a = 0.1, \; b = 0.3\) .
  */
+// Hypocycloid x function
+double hypocycloidX(double a, double b, double t)
+{
+    double ratio = b / a;
+    return (a - b) * cos(ratio * t) - b * cos(t - ratio * t);
+}
+
+// Hypocycloid y function
+double hypocycloidY(double a, double b, double t)
+{
+    double ratio = b / a;
+    return (a - b) * sin(ratio * t) - b * sin(t - ratio * t);
+}
+
 void Display7()
 {
+    double a = 0.1, b = 0.3;
+    double tmin = 0, tmax = 2 * pi;
+
+    plot(hypocycloidX, hypocycloidY, a, b, tmin, tmax);
 }
 
 /*
@@ -343,7 +413,6 @@ void Display9()
     double tmax = 2 * pi;
     double step = 0.01;
 
-
     // First, compute the maximum extent
     for (double t = tmin; t <= tmax; t += step)
     {
@@ -382,7 +451,6 @@ void Display9()
 
     glEnd();
 }
-
 
 /*
 5) Longchamps' Trisectrix:
