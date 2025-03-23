@@ -178,8 +178,59 @@ void Display3()
     glEnd();
 }
 // 3) function arguments e.g.: f(a, b, t), where a and b are function family parameters, and the is the driving variables.
-void plot(double (*x)(double, double, double), double (*y)(double, double, double), double a, double b, double intervalStart, double intervalEnd, double step = 0.01, double scaleX = 1, double scaleY = 1, GLint primitive = GL_LINE_STRIP);
+void plot(double (*x)(double, double, double), double (*y)(double, double, double),
+          double a, double b, double intervalStart, double intervalEnd,
+          double step = 0.01, double scaleX = 1, double scaleY = 1,
+          GLint primitive = GL_LINE_STRIP)
+{
 
+    double xmax = 0, ymax = 0;
+
+    // First, compute the maximum extent of the function to properly scale it
+    for (double t = intervalStart; t <= intervalEnd; t += step)
+    {
+        double xVal = x(a, b, t);
+        double yVal = y(a, b, t);
+
+        // Track maximum absolute values for scaling
+        xmax = std::max(xmax, std::abs(xVal));
+        ymax = std::max(ymax, std::abs(yVal));
+    }
+
+    // Add a small margin to ensure the curve fits within the display area
+    xmax *= 1.1;
+    ymax *= 1.1;
+
+    // Apply additional scaling if needed
+    xmax /= scaleX;
+    ymax /= scaleY;
+
+    // Plot the function with color gradient
+    glBegin(primitive);
+
+    // Total number of points to draw
+    int numPoints = (int)((intervalEnd - intervalStart) / step);
+    int pointIndex = 0;
+
+    for (double t = intervalStart; t <= intervalEnd; t += step)
+    {
+        double xVal = x(a, b, t);
+        double yVal = y(a, b, t);
+
+        // Calculate gradient factor (0 to 1) based on current position
+        double gradientFactor = (double)pointIndex / numPoints;
+
+        // Red component transitions based on gradient
+        glColor3f(1.0 - gradientFactor, 0.1, 0.1);
+
+        // Scale to fit within the [-1, 1] OpenGL viewport
+        glVertex2d(xVal / xmax, yVal / ymax);
+
+        pointIndex++;
+    }
+
+    glEnd();
+}
 /*
   2) Circle Concoid (Limaçon, Pascal's Snail):
   \(x = 2 \cdot (a \cdot cos(t) + b) \cdot cos(t), \; y = 2 \cdot (a \cdot cos(t) + b) \cdot sin(t), \; t \in (-\pi, \pi)\) .
