@@ -247,8 +247,56 @@ void Display7()
  \( r = a \cdot e^{1+t}, \; t \in (0, \infty) \) .
  For this plot, \(a = 0.02\) .
 */
+/*
+ 4) Logarithmic spiral (in polar coordinates):
+ \( r = a \cdot e^{1+t}, \; t \in (0, \infty) \) .
+ For this plot, \(a = 0.02\) .
+*/
 void Display8()
 {
+    double a = 0.02;
+    double xmax = 0, ymax = 0;
+
+    double tmin = 0, tmax = 10;
+    double step = 0.01;
+
+    // First, compute the maximum extent
+    for (double t = tmin; t <= tmax; t += step)
+    {
+        double x = a * exp(1 + t) * cos(t);
+        double y = a * exp(1 + t) * sin(t);
+
+        xmax = std::max(xmax, std::abs(x));
+        ymax = std::max(ymax, std::abs(y));
+    }
+
+    // Add a small margin
+    xmax *= 1.1;
+    ymax *= 1.1;
+
+    // Plot the function with color gradient
+    glBegin(GL_LINE_STRIP);
+
+    int numPoints = (int)((tmax - tmin) / step);
+    int pointIndex = 0;
+
+    for (double t = tmin; t <= tmax; t += step)
+    {
+        double x = a * exp(1 + t) * cos(t);
+        double y = a * exp(1 + t) * sin(t);
+
+        // Calculate gradient factor
+        double gradientFactor = (double)pointIndex / numPoints;
+
+        // Transition from red to black
+        glColor3f(gradientFactor, 0.1, 0.1);
+
+        glVertex2d(x / xmax, y / ymax);
+
+        pointIndex++;
+    }
+
+    glEnd();
 }
 
 /*
@@ -258,7 +306,54 @@ void Display8()
 */
 void Display9()
 {
+    double a = 10;
+    double xmax = 0;
+    double ymax = 0;
+
+    double tmin = 0;
+    double tmax = 2 * pi;
+    double step = 0.01;
+
+
+    // First, compute the maximum extent
+    for (double t = tmin; t <= tmax; t += step)
+    {
+        double x = sin(a * t) * cos(t);
+        double y = sin(a * t) * sin(t);
+
+        xmax = std::max(xmax, std::abs(x));
+        ymax = std::max(ymax, std::abs(y));
+    }
+
+    // Add a small margin
+    xmax *= 1.1;
+    ymax *= 1.1;
+
+    // Plot the function with color gradient
+    glBegin(GL_LINE_STRIP);
+
+    int numPoints = (int)((tmax - tmin) / step);
+    int pointIndex = 0;
+
+    for (double t = tmin; t <= tmax; t += step)
+    {
+        double x = sin(a * t) * cos(t);
+        double y = sin(a * t) * sin(t);
+
+        // Calculate gradient factor
+        double gradientFactor = (double)pointIndex / numPoints;
+
+        // Transition from red to black
+        glColor3f(gradientFactor, 0.1, 0.1);
+
+        glVertex2d(x / xmax, y / ymax);
+
+        pointIndex++;
+    }
+
+    glEnd();
 }
+
 
 /*
 5) Longchamps' Trisectrix:
