@@ -1,12 +1,12 @@
-#include "glut.h"
+#include <glut.h>
 #include <cmath>
 const int gridSize = 30;
 
 int windowWidth = 600;
 int windowHeight = 600;
 
-
-void reshape(int w, int h) {
+void reshape(int w, int h)
+{
     windowWidth = w;
     windowHeight = h;
 
@@ -18,16 +18,19 @@ void reshape(int w, int h) {
     gluOrtho2D(0, gridSize, 0, gridSize);
     glMatrixMode(GL_MODELVIEW);
 }
-void drawGrid() {
+void drawGrid()
+{
     glColor3f(0.7f, 0.7f, 0.7f);
-    for (int i = 0; i <= gridSize; i++) {
+    for (int i = 0; i <= gridSize; i++)
+    {
         glBegin(GL_LINES);
         glVertex2f(i, 0);
         glVertex2f(i, gridSize);
         glEnd();
     }
 
-    for (int i = 0; i <= gridSize; i++) {
+    for (int i = 0; i <= gridSize; i++)
+    {
         glBegin(GL_LINES);
         glVertex2f(0, i);
         glVertex2f(gridSize, i);
@@ -35,7 +38,8 @@ void drawGrid() {
     }
 }
 
-void drawVirtualLine(int x1, int y1, int x2, int y2) {
+void drawVirtualLine(int x1, int y1, int x2, int y2)
+{
     glColor3f(0.0f, 0.0f, 1.0f);
     glLineWidth(1.f);
     glBegin(GL_LINES);
@@ -45,11 +49,13 @@ void drawVirtualLine(int x1, int y1, int x2, int y2) {
     glLineWidth(1.0f);
 }
 
-void drawVirtualCircle(int cx, int cy, float radius = 5.0f, int segments = 100) {
+void drawVirtualCircle(int cx, int cy, float radius = 5.0f, int segments = 100)
+{
     glColor3f(0.0f, 0.0f, 1.0f);
     glLineWidth(1.f);
     glBegin(GL_LINE_LOOP);
-    for (int i = 0; i < segments; ++i) {
+    for (int i = 0; i < segments; ++i)
+    {
         float theta = 2.0f * 3.1415926f * float(i) / float(segments);
         float x = radius * cosf(theta);
         float y = radius * sinf(theta);
@@ -59,10 +65,12 @@ void drawVirtualCircle(int cx, int cy, float radius = 5.0f, int segments = 100) 
     glLineWidth(1.0f);
 }
 
-void drawDiscAt(int x, int y, float radius = 0.3f, int segments = 20) {
+void drawDiscAt(int x, int y, float radius = 0.3f, int segments = 20)
+{
     glColor3f(0.0f, 0.0f, 0.0f);
     glBegin(GL_POLYGON);
-    for (int i = 0; i < segments; ++i) {
+    for (int i = 0; i < segments; ++i)
+    {
         float theta = 2.0f * 3.1415926f * float(i) / float(segments);
         float dx = radius * cosf(theta);
         float dy = radius * sinf(theta);
@@ -71,16 +79,20 @@ void drawDiscAt(int x, int y, float radius = 0.3f, int segments = 20) {
     glEnd();
 }
 
-void drawThickDisc(int x, int y, int thickness = 1) {
-    for (int dx = -thickness; dx <= thickness; dx++) {
-        for (int dy = -thickness; dy <= thickness; dy++) {
+void drawThickDisc(int x, int y, int thickness = 1)
+{
+    for (int dx = -thickness; dx <= thickness; dx++)
+    {
+        for (int dy = -thickness; dy <= thickness; dy++)
+        {
             if (dx * dx + dy * dy <= thickness * thickness)
                 drawDiscAt(x + dx, y + dy);
         }
     }
 }
 
-void rasterizeLine(int x0, int y0, int x1, int y1, int thickness = 1) {
+void rasterizeLine(int x0, int y0, int x1, int y1, int thickness = 1)
+{
 
     /*
         Thickness table
@@ -98,47 +110,64 @@ void rasterizeLine(int x0, int y0, int x1, int y1, int thickness = 1) {
     int dy = -abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
     int err = dx + dy;
 
-    while (true) {
+    while (true)
+    {
         drawThickDisc(x0, y0, thickness);
 
-        if (x0 == x1 && y0 == y1) break;
+        if (x0 == x1 && y0 == y1)
+            break;
         int e2 = 2 * err;
-        if (e2 >= dy) { err += dy; x0 += sx; }
-        if (e2 <= dx) { err += dx; y0 += sy; }
+        if (e2 >= dy)
+        {
+            err += dy;
+            x0 += sx;
+        }
+        if (e2 <= dx)
+        {
+            err += dx;
+            y0 += sy;
+        }
     }
 }
 
-void rasterizeLineBresenham(int x0, int y0, int x1, int y1, int thickness = 1) {
+void rasterizeLineBresenham(int x0, int y0, int x1, int y1, int thickness = 1)
+{
     int dx = abs(x1 - x0);
     int dy = abs(y1 - y0);
     int sx = (x0 < x1) ? 1 : -1;
     int sy = (y0 < y1) ? 1 : -1;
 
     drawVirtualLine(x0, y0, x1, y1);
-    //Octants 1 and 2
-    if (dx > dy) {
+    // Octants 1 and 2
+    if (dx > dy)
+    {
         int err = dx / 2;
 
-        while (x0 != x1) {
+        while (x0 != x1)
+        {
             drawThickDisc(x0, y0, thickness);
 
             err -= dy;
-            if (err < 0) {
+            if (err < 0)
+            {
                 y0 += sy;
                 err += dx;
             }
             x0 += sx;
         }
     }
-    //Octants 3 and 4
-    else {
+    // Octants 3 and 4
+    else
+    {
         int err = dy / 2;
 
-        while (y0 != y1) {
+        while (y0 != y1)
+        {
             drawThickDisc(x0, y0, thickness);
 
             err -= dx;
-            if (err < 0) {
+            if (err < 0)
+            {
                 x0 += sx;
                 err += dy;
             }
@@ -147,13 +176,15 @@ void rasterizeLineBresenham(int x0, int y0, int x1, int y1, int thickness = 1) {
     }
 }
 
-void drawCircleMidPoint(int xc, int yc, int r) {
+void drawCircleMidPoint(int xc, int yc, int r)
+{
     int x = 0, y = r;
     int d = 1 - r;
 
     drawVirtualCircle(xc, yc, r);
     // 8 octants
-    auto drawSymmetry = [&](int x, int y) {
+    auto drawSymmetry = [&](int x, int y)
+    {
         // One call for each octant
         drawDiscAt(xc + x, yc + y);
         drawDiscAt(xc - x, yc + y);
@@ -168,20 +199,24 @@ void drawCircleMidPoint(int xc, int yc, int r) {
         rasterizeLineBresenham(xc - x, yc - y, xc + x, yc - y, 0);
         rasterizeLineBresenham(xc - y, yc + x, xc + y, yc + x, 0);
         rasterizeLineBresenham(xc - y, yc - x, xc + y, yc - x, 0);
-        };
+    };
 
     drawSymmetry(x, y);
 
-    for (int i = 0; i <= x; i++) {
+    for (int i = 0; i <= x; i++)
+    {
         drawSymmetry(i, y);
     }
 
     // Incremental approach for the circle's edge calculation
-    while (x < y) {
-        if (d < 0) {
+    while (x < y)
+    {
+        if (d < 0)
+        {
             d += 2 * x + 3; // East
         }
-        else {
+        else
+        {
             d += 2 * (x - y) + 5; // South-East
             y--;
         }
@@ -190,7 +225,8 @@ void drawCircleMidPoint(int xc, int yc, int r) {
         drawSymmetry(x, y);
     }
 }
-void display() {
+void display()
+{
     glClear(GL_COLOR_BUFFER_BIT);
     glLoadIdentity();
     drawGrid();
@@ -218,7 +254,8 @@ void display() {
     glFlush();
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv)
+{
     glutInit(&argc, argv);
     glutInitWindowSize(windowWidth, windowHeight);
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);

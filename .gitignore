@@ -6,3 +6,6 @@ Testing.bin
 
 # Ignora fisierele de configurare ale sistemului
 .DS_Store
+
+venv/
+Homework_2/Salary_dataset.csv
