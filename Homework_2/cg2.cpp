@@ -208,7 +208,6 @@ void drawCircleMidPoint(int xc, int yc, int r)
         drawSymmetry(i, y);
     }
 
-    // Incremental approach for the circle's edge calculation
     while (x < y)
     {
         if (d < 0)
@@ -261,7 +260,7 @@ int main(int argc, char **argv)
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
     glutCreateWindow("30x30 Raster Grid");
 
-    glClearColor(1.0, 1.0, 1.0, 1.0); // white background
+    glClearColor(1.0, 1.0, 1.0, 1.0);
 
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
